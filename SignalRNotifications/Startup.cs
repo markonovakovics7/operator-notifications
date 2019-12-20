@@ -24,6 +24,14 @@ namespace SignalRNotifications
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options => options.AddPolicy("CorsPolicy",
+            builder =>
+            {
+                builder.WithOrigins("http://localhost:8080", "http://localhost:5001")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials();
+            }));
             services.AddRazorPages();
             services.AddSignalR();
         }
@@ -48,6 +56,8 @@ namespace SignalRNotifications
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {
