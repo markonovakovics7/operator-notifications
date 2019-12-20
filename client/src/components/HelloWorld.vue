@@ -24,6 +24,10 @@ export default {
   name: 'HelloWorld',
   props: {
     msg: String
+  },
+
+   created(){
+  
   }
 }
 </script>
