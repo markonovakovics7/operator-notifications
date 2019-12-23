@@ -21,9 +21,7 @@ import io from 'socket.io-client'; //eslint-disable-line
 import {HubConnectionBuilder, signalR, LogLevel} from '@aspnet/signalr'; //eslint-disable-line
 export default {
   name: 'HelloWorld',
-
   props: {
-   
       msg: String
   },
   data(){
@@ -40,15 +38,11 @@ export default {
 
    },
    created(){
-
-     console.log(this); //eslint-disable-line
-   this.connection = new HubConnectionBuilder()
-         .withUrl('https://localhost:5001/notificationHub/negotiate?negotiateVersion=1')
+     console.log(123); //eslint-disable-line
+     this.connection = new HubConnectionBuilder()
+         .withUrl('https://localhost:5001/notificationHub')
         .configureLogging(LogLevel.Information) 
         .build();
-      this.connection.start().catch(function(err) {
-        return console.error(err.toSting()); //eslint-disable-line
-      });
     // Listen to score changes coming from SignalR events
     
    /*  console.log(this) //eslint-disable-line
