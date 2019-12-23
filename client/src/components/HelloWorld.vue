@@ -1,33 +1,93 @@
 <template>
   <div class="hello container">
-      <form action="/action_page.php">
+    <div v-if="output !== null">{{output.message}}</div>
   <div class="form-group">
-    <label for="email">Email address:</label>
-    <input type="email" class="form-control" placeholder="Enter email" id="email">
+    <label for="name">Name:</label>
+    <input type="text" class="form-control" v-model="name" placeholder="Enter Name" id="name">
   </div>
   <div class="form-group">
-    <label for="pwd">Password:</label>
-    <input type="password" class="form-control" placeholder="Enter password" id="pwd">
+    <label for="message">Message:</label>
+    <input type="text" v-model="message" class="form-control" placeholder="Enter Message" id="message">
   </div>
   <div class="form-group form-check">
-    <label class="form-check-label">
-      <input class="form-check-input" type="checkbox"> Remember me
-    </label>
+    
   </div>
-  <button type="submit" class="btn btn-primary">Submit</button>
-</form>
+  <button type="submit" class="btn btn-primary" @click="sendMessage">Submit</button>
   </div>
 </template>
 
 <script>
+import io from 'socket.io-client'; //eslint-disable-line
+import {HubConnectionBuilder, signalR, LogLevel} from '@aspnet/signalr'; //eslint-disable-line
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
-  },
 
+  props: {
+   
+      msg: String
+  },
+  data(){
+    return {
+      name:'',
+      message:'',
+      socket:null,
+      output:null,
+      connection:"",
+      messages:[]
+    }
+  },
+   beforeCreate(){
+
+   },
    created(){
-  
+
+     console.log(this); //eslint-disable-line
+   this.connection = new HubConnectionBuilder()
+         .withUrl('https://localhost:5001/notificationHub/negotiate?negotiateVersion=1')
+        .configureLogging(LogLevel.Information) 
+        .build();
+      this.connection.start().catch(function(err) {
+        return console.error(err.toSting()); //eslint-disable-line
+      });
+    // Listen to score changes coming from SignalR events
+    
+   /*  console.log(this) //eslint-disable-line
+    const self = this;
+    this.socket = io('http://localhost:5001');
+
+      this.socket.on('chat', (data) => {
+             self.output =  data.message
+            }); 
+ */
+
+     },
+      mounted() {
+      // ---------
+      // Call client methods from hub
+      // ---------
+      var thisVue = this;
+      thisVue.connection.start();
+      thisVue.connection.on("ReceiveMessage", function(user, message) {
+        thisVue.messages.push({ user, message });
+      });
+    },
+  methods:{
+    sendMessage(){
+      console.log('taknuto'); //eslint-disable-line
+      //eslint-disable-next-line
+      const data =  {
+        name:this.name, 
+        message:this.message
+      }
+       // this.socket.emit('chat', data);
+       this.connection
+            .invoke("SendMessage", data)
+            .catch(function(err) {
+              return console.error(err.toSting()); //eslint-disable-line
+            });
+        this.name = '';
+        this.message = '';
+    }
   }
 }
 </script>
